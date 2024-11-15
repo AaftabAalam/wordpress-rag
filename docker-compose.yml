@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"  # Exposes FastAPI on port 8000
+    networks:
+      - app-network
+    volumes:
+      - ./backend:/app  # Mounts the backend directory
+    environment:
+      - PYTHONUNBUFFERED=1  # Keeps Python output visible
+  
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"  # Exposes React app on port 80
+    networks:
+      - app-network
+    depends_on:
+      - backend  # Ensures backend is ready before frontend starts
+    environment:
+      - REACT_APP_API_URL=http://backend:8000  # Points to the backend service
+
+networks:
+  app-network:
+    driver: bridge
